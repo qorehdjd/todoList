@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
 const userRouer = require('./routes/user');
+const postRouer = require('./routes/post');
 const passportConfig = require('./passport');
 
 const hpp = require('hpp');
@@ -17,7 +18,6 @@ dotenv.config();
 passportConfig();
 
 const { PORT, MONGO_URI } = process.env;
-
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log('Connected!'))
@@ -55,6 +55,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/user', userRouer);
+app.use('/post', postRouer);
 
 app.listen(PORT, () => {
   console.log(`${PORT}번 실행중`);
