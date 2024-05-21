@@ -15,19 +15,24 @@ const TodoInputContainer = styled.form`
     width: 100%;
     border: none;
     border-bottom: 1px solid green;
+    font-size: 2rem;
+
     &:focus {
       outline: none;
     }
+  }
+  input::placeholder {
+    font-weight: 600;
+    font-size: 1.6rem;
   }
   button {
     background-color: green;
     color: white;
     font-weight: 600;
     border: none;
-    padding: 10px;
-    width: 10%;
+    width: 15%;
     cursor: pointer;
-    font-size: 2rem;
+    font-size: 5rem;
     &:active {
       box-shadow: inset -0.3rem -0.1rem 1.4rem #fbfbfb, inset 0.3rem 0.4rem 0.8rem #bec5d0;
       cursor: pointer;

@@ -1,10 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import TodoInput from './TodoInput';
 import TodoList from './TodoList';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
-import { saveData } from '../../../reducers/post';
+import { saveList } from '../../../reducers/post';
 
 const TodoListLayout = styled.div`
   display: flex;
@@ -46,7 +46,8 @@ const TodoListLayout = styled.div`
         background-color: #008000;
         color: #ffffff;
         border: 1px solid #008000;
-        padding: 5px 20px;
+        padding: 10px 30px;
+        font-size: 2rem;
         border-radius: 4px;
         cursor: pointer;
       }
@@ -69,23 +70,27 @@ export interface TodoList {
   count: number;
 }
 
-const obj = {
-  '2024-05-24': [
-    { title: 'hi', count: 0 },
-    { title: 'good', count: 5 },
-  ],
-  '2024-07-20': [
-    { title: 'hi', count: 0 },
-    { title: 'good', count: 5 },
-  ],
-};
-
 const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
+  const didMount = useRef(false);
+
+  const [isDeleteList, setIsDeleteList] = useState(false); // list가 아무것도 없을 때 저장되지 않게 하는것과 list 1개 삭제해서 list가 비어있을 때 저장되는 것을 구분
 
   const date = useSelector((state: RootState) => state.post.date);
-  const lists = useSelector((state: RootState) => state.post.lists);
+  const dateLists = useSelector((state: RootState) => state.post.posts.dateLists);
+  const saveListDone = useSelector((state: RootState) => state.post.saveListDone);
+
+  useEffect(() => {
+    if (didMount.current) {
+      if (saveListDone) {
+        setIsDeleteList(false);
+        alert('저장 완료');
+      }
+    } else {
+      didMount.current = true;
+    }
+  }, [saveListDone]);
 
   const onClosePopup = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -94,13 +99,18 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
     [onCloseModal],
   );
 
-  const onSaveData = useCallback(() => {
+  const onSaveList = useCallback(() => {
+    if (dateLists.length === 0 && !isDeleteList) return;
     const data = {
-      lists,
+      dateLists,
       date,
     };
-    dispatch(saveData(data));
-  }, [dispatch, lists, date]);
+    dispatch(saveList(data));
+  }, [dispatch, dateLists, date, isDeleteList]);
+
+  const onClickDeleteList = useCallback(() => {
+    setIsDeleteList(true);
+  }, []);
 
   return (
     <TodoListLayout onClick={onClosePopup}>
@@ -110,12 +120,12 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
         </h1>
         <TodoInput />
         <div className='todoLists_wrapper'>
-          {lists?.map((list) => (
-            <TodoList key={list.title} list={list} />
+          {dateLists?.map((list) => (
+            <TodoList key={list.title} list={list} onClickDeleteList={onClickDeleteList} />
           ))}
         </div>
         <div className='save_btn_wrapper'>
-          <button onClick={onSaveData}>저장하기</button>
+          <button onClick={onSaveList}>저장하기</button>
         </div>
       </div>
     </TodoListLayout>

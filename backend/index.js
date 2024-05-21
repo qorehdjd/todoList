@@ -8,6 +8,8 @@ const passport = require('passport');
 
 const userRouer = require('./routes/user');
 const postRouer = require('./routes/post');
+const postsRouer = require('./routes/posts');
+
 const passportConfig = require('./passport');
 
 const hpp = require('hpp');
@@ -56,6 +58,7 @@ app.use(passport.session());
 
 app.use('/user', userRouer);
 app.use('/post', postRouer);
+app.use('/posts', postsRouer);
 
 app.listen(PORT, () => {
   console.log(`${PORT}번 실행중`);

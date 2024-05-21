@@ -4,13 +4,8 @@ const PostSchema = mongoose.Schema({
   userId: String,
   lists: [
     {
-      date: String,
-      items: [
-        {
-          title: String,
-          count: Number,
-        },
-      ],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'List',
     },
   ],
 });

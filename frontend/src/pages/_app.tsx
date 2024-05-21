@@ -25,6 +25,17 @@ const GlobalStyle = createGlobalStyle`
   html {
     font-size: 62.5%;
   }
+
+  @media screen and (max-width: 1200px) {
+    html {
+      font-size: 60%;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    html {
+      font-size: 50%;
+    }
+  }
 `;
 
 const App = ({ Component, pageProps }: AppProps) => {

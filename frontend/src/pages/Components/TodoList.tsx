@@ -12,6 +12,9 @@ const TodoListLayout = styled.div`
   align-items: center;
   font-size: 1.8rem;
   margin-bottom: 12px;
+  .title {
+    font-size: 2rem;
+  }
   .count_btn_wrapper {
     display: flex;
     align-items: center;
@@ -19,48 +22,30 @@ const TodoListLayout = styled.div`
       color: #ff0000;
       margin-left: 7px;
       cursor: pointer;
+      font-size: 3rem;
     }
     button {
       background-color: green;
       color: white;
       border: 1px solid green;
-      padding: 4px 8px;
       cursor: pointer;
+      padding: 0.5rem 1.5rem;
+      font-size: 2.5rem;
     }
     .count {
       margin: 0 5px;
+      font-size: 2rem;
     }
   }
 `;
 
-const dummyData = [
-  {
-    title: '강아지랑 놀기',
-    count: 2,
-  },
-  {
-    title: '물건 정리하기',
-    count: 2,
-  },
-  {
-    title: '턱걸이 하기',
-    count: 7,
-  },
-  {
-    title: '환자들 진단하기',
-    count: 10,
-  },
-  {
-    title: '컴퓨터 조립하기',
-    count: 18,
-  },
-  {
-    title: '키보드 부품 가지러가기',
-    count: 20,
-  },
-];
-
-const TodoList = ({ list }: { list: { title: string; count: number } }) => {
+const TodoList = ({
+  list,
+  onClickDeleteList,
+}: {
+  list: { title: string; count: number };
+  onClickDeleteList: () => void;
+}) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const onClickDecreaseCount = useCallback(
@@ -76,11 +61,12 @@ const TodoList = ({ list }: { list: { title: string; count: number } }) => {
 
   const onDeleteList = useCallback(() => {
     dispatch(postSlice.actions.deleteList(list.title));
-  }, [list.title, dispatch]);
+    onClickDeleteList();
+  }, [list.title, dispatch, onClickDeleteList]);
 
   return (
     <TodoListLayout>
-      <div>{list.title}</div>
+      <div className='title'>{list.title}</div>
       <div className='count_btn_wrapper'>
         <button className='decrease_btn' onClick={onClickDecreaseCount}>
           -
