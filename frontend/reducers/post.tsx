@@ -117,11 +117,16 @@ const postSlice = createSlice({
       .addCase(saveList.fulfilled, (state, action) => {
         state.saveListLoading = false;
         state.saveListDone = true;
-        state.posts.dateLists = action.payload.dateLists;
+        state.posts.dateLists = action.payload.dateLists.items;
         const list = state.posts.lists.find((list) => list.date === action.payload.date);
+        console.log('list', list);
         if (list) {
-          list.items = action.payload.dateLists; // 달력 전체에서도 리렌더링
+          list.items = action.payload.dateLists.items;
+          return;
         }
+        state.posts.lists.push(action.payload.dateLists);
+
+        // listIndex.items = action.payload.dateLists; // 달력 전체에서도 리렌더링
       })
       .addCase(saveList.rejected, (state, action) => {
         state.saveListLoading = false;

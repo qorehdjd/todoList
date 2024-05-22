@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import Login from './login';
 import { EventContentArg } from '@fullcalendar/core/index.js';
+import { FaCheck } from 'react-icons/fa6';
 
 // const events = [
 //   { title: 'Meeting1', start: new Date('2024-5-29'), color: '#ad1457' },
@@ -29,12 +30,19 @@ const ScheduleLayout = styled.div`
     font-size: 2rem;
     overflow: scroll;
   }
+  /* .fc-daygrid-event-harness {
+    overflow: hidden;
+  } */
+  .fc-day-today {
+    background-color: white;
+  }
 `;
 
 const Schedule = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const me = useSelector((state: RootState) => state.user.me);
+  const lists = useSelector((state: RootState) => state.post.posts.lists);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -56,7 +64,17 @@ const Schedule = () => {
   const onCloseModal = useCallback(() => {
     setIsOpenModal(false);
   }, []);
-
+  console.log('lists', lists);
+  const ModifiedLists = useMemo(() => {
+    return lists.map((list) => {
+      console.log(list);
+      const ModifiedTitle = list.items?.map((item) => {
+        return item.title;
+      });
+      return { start: list.date, title: ModifiedTitle, color: 'green' };
+    });
+  }, [lists]);
+  console.log('Mo', ModifiedLists);
   return (
     <>
       {me ? (
@@ -66,8 +84,8 @@ const Schedule = () => {
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView='dayGridMonth'
-            weekends={false}
-            // events={events}
+            weekends={true}
+            events={ModifiedLists}
             eventContent={renderEventContent}
             dateClick={onClickDate}
           />
@@ -80,10 +98,24 @@ const Schedule = () => {
 };
 
 function renderEventContent(eventInfo: EventContentArg) {
+  console.log('123', eventInfo);
   return (
     <>
-      <b>{eventInfo.timeText}</b>
-      <i>{eventInfo.event.title}</i>
+      {eventInfo.event.title.split(',').map((tit) => (
+        <div
+          style={{
+            borderBottom: '1px solid black',
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '0 5px',
+            alignItems: 'center',
+          }}
+          key={tit}
+        >
+          <FaCheck style={{ width: '20px', height: '20px', marginRight: '7px' }} />
+          <span style={{ overflow: 'hidden', fontSize: '1.7rem' }}>{tit}</span>
+        </div>
+      ))}
     </>
   );
 }

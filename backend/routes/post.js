@@ -8,11 +8,16 @@ router.post('/', async (req, res, next) => {
   try {
     const { dateLists: items, date } = req.body;
     const existList = await List.findOne({ userId: req.user._id, date });
-    console.log('existList', existList);
+    if (existList && items.length === 0) {
+      // 데이터베이스에서 items가 없을때는 삭제 메모리 낭비 방지
+      await existList.deleteOne({ _id: existList._id });
+      return res.status(200).json({ dateLists: [], date });
+    }
     if (existList) {
       existList.items = items;
       existList.save();
-      return res.status(200).json({ dateLists: existList.items, date });
+      // return res.status(200).json({ dateLists: existList.items, date });
+      return res.status(200).json({ dateLists: existList, date });
     }
 
     const list = await new List({
@@ -20,9 +25,9 @@ router.post('/', async (req, res, next) => {
       date,
       items,
     });
-    console.log('ppppost', list);
     await list.save();
-    return res.status(200).json({ dateLists: list.items, date });
+    // return res.status(200).json({ dateLists: list.items, date });
+    return res.status(200).json({ dateLists: list, date });
   } catch (error) {
     console.error(error);
     next(error);
@@ -32,11 +37,9 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
   try {
     const post = await List.findOne({ userId: req.user._id, date: req.query.date });
-    console.log('pppoost', post);
     if (!post) {
       return res.status(200).json({ lists: [] });
     }
-    // const lists = post?.lists.find((list) => list.date === req.query.date);
     return res.status(200).json({ lists: post.items });
   } catch (error) {
     console.error(error);
