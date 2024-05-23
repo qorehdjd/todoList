@@ -8,7 +8,7 @@ import postSlice, { getDateList, getLists } from '../../reducers/post';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import Login from './login';
-import { EventContentArg } from '@fullcalendar/core/index.js';
+import { EventClickArg, EventContentArg } from '@fullcalendar/core/index.js';
 import { FaCheck } from 'react-icons/fa6';
 import { logout } from '../../reducers/user';
 
@@ -18,7 +18,7 @@ const ScheduleLayout = styled.div`
   display: flex;
   flex-direction: column;
   .logout_wrapper {
-    margin-top: 10px;
+    margin: 5px 0 15px 0;
     text-align: center;
     button {
       background-color: green;
@@ -31,6 +31,12 @@ const ScheduleLayout = styled.div`
       font-size: 2rem;
       font-weight: 600;
     }
+  }
+  .list-item {
+    background-color: green;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    cursor: pointer;
   }
   .fc {
     flex: 1;
@@ -80,6 +86,41 @@ const Schedule = () => {
     [dispatch],
   );
 
+  const onClickDateItem = useCallback(
+    async (e: EventClickArg) => {
+      dispatch(postSlice.actions.reviseDate(e.event.startStr));
+      await dispatch(getDateList(e.event.startStr));
+      setIsOpenModal(true);
+    },
+    [dispatch],
+  );
+
+  const renderEventContent = (eventInfo: EventContentArg) => {
+    return (
+      <>
+        {eventInfo.event.title
+          .split(',')
+          .slice(0, 3) // 달력에 list 3개까지만 표시
+          .map((tit) => (
+            <div
+              className='list-item'
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '0 5px',
+                alignItems: 'center',
+                cursor: 'pointer',
+              }}
+              key={tit}
+            >
+              <FaCheck style={{ width: '2rem', height: '2rem', marginRight: '7px' }} />
+              <span style={{ overflow: 'hidden', fontSize: '1.7rem', flex: '1' }}>{tit}</span>
+            </div>
+          ))}
+      </>
+    );
+  };
+
   const onCloseModal = useCallback(() => {
     setIsOpenModal(false);
   }, []);
@@ -89,9 +130,40 @@ const Schedule = () => {
       const ModifiedTitle = list.items?.map((item) => {
         return item.title;
       });
-      return { start: list.date, title: ModifiedTitle, color: 'green' };
+      return { start: list.date, title: ModifiedTitle, color: 'white', backgroundColor: 'white', textColor: 'white' };
     });
   }, [lists]);
+
+  // 전체 데이터 가져오기 알고리즘
+  const data = lists
+    .map((list) => {
+      const data = list.items.map((item) => {
+        return { title: item.title, count: item.count };
+      });
+      return data;
+    })
+    .flat();
+
+  const answer = {};
+
+  for (let key in data) {
+    if (answer[data[key].title]) {
+      answer[data[key].title] += data[key].count;
+    } else {
+      answer[data[key].title] = data[key].count;
+    }
+  }
+
+  const finalData = [];
+
+  for (let key in answer) {
+    console.log('answer', answer);
+    console.log('key', key);
+    finalData.push({ title: key, count: answer[key] });
+  }
+
+  console.log('answer', finalData);
+
   return (
     <>
       {me ? (
@@ -107,6 +179,7 @@ const Schedule = () => {
             events={ModifiedLists}
             eventContent={renderEventContent}
             dateClick={onClickDate}
+            eventClick={onClickDateItem}
           />
         </ScheduleLayout>
       ) : (
@@ -115,27 +188,5 @@ const Schedule = () => {
     </>
   );
 };
-
-function renderEventContent(eventInfo: EventContentArg) {
-  return (
-    <>
-      {eventInfo.event.title.split(',').map((tit) => (
-        <div
-          style={{
-            borderBottom: '1px solid black',
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '0 5px',
-            alignItems: 'center',
-          }}
-          key={tit}
-        >
-          <FaCheck style={{ width: '20px', height: '20px', marginRight: '7px' }} />
-          <span style={{ overflow: 'hidden', fontSize: '1.7rem' }}>{tit}</span>
-        </div>
-      ))}
-    </>
-  );
-}
 
 export default Schedule;

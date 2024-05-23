@@ -54,7 +54,7 @@ const TodoInput = () => {
         inputRef.current?.focus();
         return;
       }
-      dispatch(postSlice.actions.addlist({ title: title.trim(), count: 0 }));
+      dispatch(postSlice.actions.addlist({ title: title.trim(), count: 1 }));
       setTitle('');
     },
     [title, dispatch],
