@@ -10,29 +10,34 @@ import { AppDispatch, RootState } from '../../store';
 import Login from './login';
 import { EventContentArg } from '@fullcalendar/core/index.js';
 import { FaCheck } from 'react-icons/fa6';
-
-// const events = [
-//   { title: 'Meeting1', start: new Date('2024-5-29'), color: '#ad1457' },
-//   { title: 'Meeting2', start: new Date('2024-5-30') },
-//   { title: 'Meeting2', start: new Date('2024-5-10') },
-//   { title: 'Meeting2', start: new Date('2024-5-13') },
-//   { title: 'Meeting2', start: new Date('2024-5-15') },
-//   { title: 'Meeting2', start: new Date('2024-5-18') },
-// ];
+import { logout } from '../../reducers/user';
 
 const ScheduleLayout = styled.div`
   height: 100vh;
   position: relative;
   display: flex;
   flex-direction: column;
+  .logout_wrapper {
+    margin-top: 10px;
+    text-align: center;
+    button {
+      background-color: green;
+      color: white;
+      border: none;
+      width: 15rem;
+      height: 5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+  }
   .fc {
     flex: 1;
     font-size: 2rem;
     overflow: scroll;
   }
-  /* .fc-daygrid-event-harness {
-    overflow: hidden;
-  } */
+
   .fc-day-today {
     background-color: white;
   }
@@ -40,9 +45,11 @@ const ScheduleLayout = styled.div`
 
 const Schedule = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const didMount = useRef(false);
 
   const me = useSelector((state: RootState) => state.user.me);
   const lists = useSelector((state: RootState) => state.post.posts.lists);
+  const dateLists = useSelector((state: RootState) => state.post.posts.dateLists);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -51,6 +58,18 @@ const Schedule = () => {
       dispatch(getLists());
     }
   }, [me, dispatch]);
+
+  useEffect(() => {
+    if (didMount.current) {
+      dispatch(getLists());
+    } else {
+      didMount.current = true;
+    }
+  }, [dateLists, dispatch]);
+
+  const onClickLogout = useCallback(() => {
+    dispatch(logout());
+  }, [dispatch]);
 
   const onClickDate = useCallback(
     async (e: DateClickArg) => {
@@ -64,23 +83,23 @@ const Schedule = () => {
   const onCloseModal = useCallback(() => {
     setIsOpenModal(false);
   }, []);
-  console.log('lists', lists);
-  const ModifiedLists = useMemo(() => {
+
+  const ModifiedLists: any = useMemo(() => {
     return lists.map((list) => {
-      console.log(list);
       const ModifiedTitle = list.items?.map((item) => {
         return item.title;
       });
       return { start: list.date, title: ModifiedTitle, color: 'green' };
     });
   }, [lists]);
-  console.log('Mo', ModifiedLists);
   return (
     <>
       {me ? (
         <ScheduleLayout>
           {isOpenModal && <Todo onCloseModal={onCloseModal} />}
-          <h1>Demo App</h1>
+          <div className='logout_wrapper'>
+            <button onClick={onClickLogout}>로그아웃</button>
+          </div>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView='dayGridMonth'
@@ -98,7 +117,6 @@ const Schedule = () => {
 };
 
 function renderEventContent(eventInfo: EventContentArg) {
-  console.log('123', eventInfo);
   return (
     <>
       {eventInfo.event.title.split(',').map((tit) => (

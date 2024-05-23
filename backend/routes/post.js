@@ -1,5 +1,4 @@
 const express = require('express');
-const Post = require('../models/Post');
 const List = require('../models/List');
 
 const router = express.Router();

@@ -49,12 +49,12 @@ const TodoInput = () => {
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (title === '') {
+      if (title.trim() === '') {
         alert('내용을 입력해주세요');
         inputRef.current?.focus();
         return;
       }
-      dispatch(postSlice.actions.addlist({ title, count: 0 }));
+      dispatch(postSlice.actions.addlist({ title: title.trim(), count: 0 }));
       setTitle('');
     },
     [title, dispatch],
