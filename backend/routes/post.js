@@ -13,9 +13,8 @@ router.post('/', async (req, res, next) => {
       return res.status(200).json({ dateLists: [], date });
     }
     if (existList) {
-      existList.items = items;
+      existList.items = items.filter((item) => item.count !== 0);
       existList.save();
-      // return res.status(200).json({ dateLists: existList.items, date });
       return res.status(200).json({ dateLists: existList, date });
     }
 
@@ -25,7 +24,6 @@ router.post('/', async (req, res, next) => {
       items,
     });
     await list.save();
-    // return res.status(200).json({ dateLists: list.items, date });
     return res.status(200).json({ dateLists: list, date });
   } catch (error) {
     console.error(error);

@@ -65,19 +65,21 @@ const TodoList = ({
   }, [list.title, dispatch, onClickDeleteList]);
 
   return (
-    <TodoListLayout>
-      <div className='title'>{list.title}</div>
-      <div className='count_btn_wrapper'>
-        <button className='decrease_btn' onClick={onClickDecreaseCount}>
-          -
-        </button>
-        <span className='count'>{list.count}</span>
-        <button className='increase_btn' onClick={onClickIncreaseCount}>
-          +
-        </button>
-        <BiSolidTrash className='trash-can-icon' onClick={onDeleteList} />
-      </div>
-    </TodoListLayout>
+    <>
+      <TodoListLayout>
+        <div className='title'>{list.title}</div>
+        <div className='count_btn_wrapper'>
+          <button className='decrease_btn' onClick={onClickDecreaseCount}>
+            -
+          </button>
+          <span className='count'>{list.count}</span>
+          <button className='increase_btn' onClick={onClickIncreaseCount}>
+            +
+          </button>
+          <BiSolidTrash className='trash-can-icon' onClick={onDeleteList} />
+        </div>
+      </TodoListLayout>
+    </>
   );
 };
 

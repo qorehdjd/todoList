@@ -18,6 +18,8 @@ export interface List {
 export interface InitailState {
   date: string;
   posts: { lists: List[]; dateLists: { _id: string; title: string; count: number }[] };
+  monthLists: { title: string; count: number }[];
+  month: string;
   saveListLoading: boolean;
   saveListDone: boolean;
   saveListError: boolean | any;
@@ -27,6 +29,9 @@ export interface InitailState {
   getListsLoading: boolean;
   getListsDone: boolean;
   getListsError: boolean | any;
+  getMonthListsLoading: boolean;
+  getMonthListsDone: boolean;
+  getMonthListsError: boolean | any;
 }
 
 export const initialState: InitailState = {
@@ -35,6 +40,8 @@ export const initialState: InitailState = {
     lists: [], // 달력페이지 모든 list들을 가져옴
     dateLists: [], // 날짜 별로 클릭했을 때 list들
   },
+  monthLists: [],
+  month: '',
   saveListLoading: false,
   saveListDone: false,
   saveListError: false,
@@ -44,6 +51,9 @@ export const initialState: InitailState = {
   getListsLoading: false, // 첫 달력에서 로딩됐을 때 가져올 전체 데이터 list
   getListsDone: false,
   getListsError: false,
+  getMonthListsLoading: false,
+  getMonthListsDone: false,
+  getMonthListsError: false,
 };
 
 export const saveList = createAsyncThunk(
@@ -72,6 +82,16 @@ export const getDateList = createAsyncThunk('get/datelist', async (date: string,
 export const getLists = createAsyncThunk('get/lists', async (_, thunkAPI) => {
   try {
     const response = await axios.get('/posts');
+    return response.data;
+  } catch (err) {
+    const customErr = err as CustomError;
+    return thunkAPI.rejectWithValue(customErr.response?.data || customErr.message);
+  }
+});
+
+export const getMonthLists = createAsyncThunk('get/monthLists', async (month: string, thunkAPI) => {
+  try {
+    const response = await axios.get(`/posts/monthLists?yearAndMonth=${month}`);
     return response.data;
   } catch (err) {
     const customErr = err as CustomError;
@@ -150,6 +170,21 @@ const postSlice = createSlice({
       .addCase(getLists.rejected, (state, action) => {
         state.getListsLoading = false;
         state.getListsError = action.payload;
+      })
+      .addCase(getMonthLists.pending, (state) => {
+        state.getMonthListsLoading = true;
+        state.getMonthListsDone = false;
+        state.getMonthListsError = false;
+      })
+      .addCase(getMonthLists.fulfilled, (state, action) => {
+        state.getMonthListsLoading = false;
+        state.getMonthListsDone = true;
+        state.monthLists = action.payload.monthLists;
+        state.month = action.payload.month;
+      })
+      .addCase(getMonthLists.rejected, (state, action) => {
+        state.getMonthListsLoading = false;
+        state.getMonthListsError = action.payload;
       }),
 });
 

@@ -4,13 +4,15 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import Todo from './todo';
 import styled from 'styled-components';
-import postSlice, { getDateList, getLists } from '../../reducers/post';
+import moment from 'moment';
+import postSlice, { getDateList, getLists, getMonthLists } from '../../reducers/post';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import Login from './login';
 import { EventClickArg, EventContentArg } from '@fullcalendar/core/index.js';
 import { FaCheck } from 'react-icons/fa6';
 import { logout } from '../../reducers/user';
+import MonthLists from './Components/MonthLists';
 
 const ScheduleLayout = styled.div`
   height: 100vh;
@@ -19,13 +21,14 @@ const ScheduleLayout = styled.div`
   flex-direction: column;
   .logout_wrapper {
     margin: 5px 0 15px 0;
-    text-align: center;
+    text-align: right;
+    margin-right: 20px;
     button {
       background-color: green;
       color: white;
       border: none;
-      width: 15rem;
-      height: 5rem;
+      width: 13rem;
+      height: 4rem;
       border-radius: 4px;
       cursor: pointer;
       font-size: 2rem;
@@ -49,6 +52,21 @@ const ScheduleLayout = styled.div`
   }
 `;
 
+const monthLists: any = {
+  January: '01',
+  February: '02',
+  March: '03',
+  April: '04',
+  May: '05',
+  June: '06',
+  July: '07',
+  August: '08',
+  September: '09',
+  October: '10',
+  November: '11',
+  December: '12',
+};
+
 const Schedule = () => {
   const dispatch = useDispatch<AppDispatch>();
   const didMount = useRef(false);
@@ -58,14 +76,21 @@ const Schedule = () => {
   const dateLists = useSelector((state: RootState) => state.post.posts.dateLists);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isClickMonthLists, setIsClickMonthLists] = useState(false);
 
   useEffect(() => {
     if (me) {
-      dispatch(getLists());
+      (async () => {
+        await dispatch(getLists());
+        dispatch(postSlice.actions.reviseDate(moment().format('YYYY-MM-DD')));
+        await dispatch(getDateList(moment().format('YYYY-MM-DD')));
+        setIsOpenModal(true);
+      })();
     }
   }, [me, dispatch]);
 
   useEffect(() => {
+    // date에서 일정을 추가하거나 삭제했을 때 리렌더링 될 수 있도록
     if (didMount.current) {
       dispatch(getLists());
     } else {
@@ -101,22 +126,25 @@ const Schedule = () => {
         {eventInfo.event.title
           .split(',')
           .slice(0, 3) // 달력에 list 3개까지만 표시
-          .map((tit) => (
-            <div
-              className='list-item'
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '0 5px',
-                alignItems: 'center',
-                cursor: 'pointer',
-              }}
-              key={tit}
-            >
-              <FaCheck style={{ width: '2rem', height: '2rem', marginRight: '7px' }} />
-              <span style={{ overflow: 'hidden', fontSize: '1.7rem', flex: '1' }}>{tit}</span>
-            </div>
-          ))}
+          .map((tit) => {
+            if (!tit) return null;
+            return (
+              <div
+                className='list-item'
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '0 5px',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                }}
+                key={tit}
+              >
+                <FaCheck style={{ width: '2rem', height: '2rem', marginRight: '7px' }} />
+                <span style={{ overflow: 'hidden', fontSize: '1.7rem', flex: '1' }}>{tit}</span>
+              </div>
+            );
+          })}
       </>
     );
   };
@@ -125,56 +153,53 @@ const Schedule = () => {
     setIsOpenModal(false);
   }, []);
 
+  const onCloseMonthListsModal = useCallback(() => {
+    setIsClickMonthLists(false);
+  }, []);
+
   const ModifiedLists: any = useMemo(() => {
     return lists.map((list) => {
       const ModifiedTitle = list.items?.map((item) => {
+        if (item.count === 0) return null;
         return item.title;
       });
       return { start: list.date, title: ModifiedTitle, color: 'white', backgroundColor: 'white', textColor: 'white' };
     });
   }, [lists]);
 
-  // 전체 데이터 가져오기 알고리즘
-  const data = lists
-    .map((list) => {
-      const data = list.items.map((item) => {
-        return { title: item.title, count: item.count };
-      });
-      return data;
-    })
-    .flat();
-
-  const answer = {};
-
-  for (let key in data) {
-    if (answer[data[key].title]) {
-      answer[data[key].title] += data[key].count;
-    } else {
-      answer[data[key].title] = data[key].count;
-    }
-  }
-
-  const finalData = [];
-
-  for (let key in answer) {
-    console.log('answer', answer);
-    console.log('key', key);
-    finalData.push({ title: key, count: answer[key] });
-  }
-
-  console.log('answer', finalData);
-
   return (
     <>
       {me ? (
         <ScheduleLayout>
           {isOpenModal && <Todo onCloseModal={onCloseModal} />}
+          {isClickMonthLists && <MonthLists onCloseMonthListsModal={onCloseMonthListsModal} />}
           <div className='logout_wrapper'>
             <button onClick={onClickLogout}>로그아웃</button>
           </div>
+
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView='dayGridMonth'
+            customButtons={{
+              myCustomButton: {
+                text: 'month lists',
+                click: function (e) {
+                  const month = document.querySelector('.fc-toolbar-title')?.textContent?.split(' ');
+                  if (month) {
+                    (async () => {
+                      const data = month[1] + '-' + monthLists[month[0]]; // 2024-05
+                      await dispatch(getMonthLists(data));
+                      setIsClickMonthLists(true);
+                    })();
+                  }
+                },
+              },
+            }}
+            headerToolbar={{
+              start: 'myCustomButton', // will normally be on the left. if RTL, will be on the right
+              center: 'title',
+              end: 'prev,next', // will normally be on the right. if RTL, will be on the left
+            }}
             weekends={true}
             events={ModifiedLists}
             eventContent={renderEventContent}

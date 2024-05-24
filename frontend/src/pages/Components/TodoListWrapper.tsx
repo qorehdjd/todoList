@@ -99,14 +99,19 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
     [onCloseModal],
   );
 
-  const onSaveList = useCallback(() => {
-    if (dateLists.length === 0 && !isDeleteList) return;
+  const onSaveList = useCallback(async () => {
+    if (dateLists.length === 0 && !isDeleteList) {
+      alert('내용을 입력해주세요');
+      return;
+    }
+    const ModifiedDateLists = dateLists.filter((dateList) => dateList.count !== 0); // count가 0인것은 제외하고 보내기
     const data = {
-      dateLists,
+      dateLists: ModifiedDateLists,
       date,
     };
-    dispatch(saveList(data));
-  }, [dispatch, dateLists, date, isDeleteList]);
+    await dispatch(saveList(data));
+    onCloseModal();
+  }, [dispatch, dateLists, date, isDeleteList, onCloseModal]);
 
   const onClickDeleteList = useCallback(() => {
     setIsDeleteList(true);
