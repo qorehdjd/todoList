@@ -4,6 +4,7 @@ const User = require('../models/User');
 
 module.exports = () => {
   passport.serializeUser((user, done) => {
+    //req.session에다가 user.id를 넣어준다. ex) req.session.passport.user = user._id
     // 로그인했을 때 쿠키를 보내준다.
     done(null, user._id); // user의 id만 따로 저장 모든 정보를 가지게되면 메모리 문제 발생하기때문
   });

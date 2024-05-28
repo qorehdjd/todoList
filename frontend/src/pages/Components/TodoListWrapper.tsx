@@ -76,6 +76,11 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
   const didMount = useRef(false);
 
   const [isDeleteList, setIsDeleteList] = useState(false); // list가 아무것도 없을 때 저장되지 않게 하는것과 list 1개 삭제해서 list가 비어있을 때 저장되는 것을 구분
+  const latelyLists = useState<{ title: string; count: number; _id: string }[]>(
+    JSON.parse(localStorage.getItem('latelyLists')),
+  );
+
+  console.log('latelyLists', latelyLists);
 
   const date = useSelector((state: RootState) => state.post.date);
   const dateLists = useSelector((state: RootState) => state.post.posts.dateLists);
@@ -105,6 +110,7 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
       return;
     }
     const ModifiedDateLists = dateLists.filter((dateList) => dateList.count !== 0); // count가 0인것은 제외하고 보내기
+    localStorage.setItem('latelyLists', JSON.stringify(ModifiedDateLists));
     const data = {
       dateLists: ModifiedDateLists,
       date,
@@ -126,7 +132,7 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
         <TodoInput />
         <div className='todoLists_wrapper'>
           {dateLists?.map((list) => (
-            <TodoList key={list.title} list={list} onClickDeleteList={onClickDeleteList} />
+            <TodoList key={list.title} list={latelyLists ? latelyLists : list} onClickDeleteList={onClickDeleteList} />
           ))}
         </div>
         <div className='save_btn_wrapper'>

@@ -10,7 +10,8 @@ const HomeLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  input {
+  .id_input,
+  .password_input {
     height: 40px;
     width: 100%;
     margin: 20px auto;
@@ -49,6 +50,18 @@ const HomeLayout = styled.div`
 
   input:focus {
     outline: none;
+  }
+
+  .auto_login_wrapper {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    text-align: left;
+    input {
+      margin-right: 7px;
+      width: 18px;
+      height: 18px;
+    }
   }
 
   .logo {
@@ -106,6 +119,7 @@ const HomeLayout = styled.div`
 const Login = () => {
   const router = useRouter();
   const didMount = useRef(false);
+  const checkboxRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch<AppDispatch>();
 
   const me = useSelector((state: RootState) => state.user.me);
@@ -140,6 +154,7 @@ const Login = () => {
       const data = {
         id,
         password,
+        autoLoginChecked: checkboxRef.current?.checked,
       };
       dispatch(login(data));
     },
@@ -161,14 +176,26 @@ const Login = () => {
   if (me) {
     return null;
   }
-
+  console.log('checkboxRef', checkboxRef.current?.checked);
   return (
     <HomeLayout>
       <div className='myform'>
         <div className='logo'>PLEASE LOG IN!</div>
         <form onSubmit={onSubmit}>
-          <input type='text' placeholder='&#xf003;   Id' value={id} onChange={onChangeId} />
-          <input type='password' placeholder=' &#xf023;  Password' value={password} onChange={onChangePassword} />
+          <input className='id_input' type='text' placeholder='&#xf003;   Id' value={id} onChange={onChangeId} />
+          <input
+            className='password_input'
+            type='password'
+            placeholder=' &#xf023;  Password'
+            value={password}
+            onChange={onChangePassword}
+          />
+          <div className='auto_login_wrapper'>
+            <input type='checkbox' name='autoLogin' id='autoLogin' ref={checkboxRef} />
+            <label htmlFor='grade-chk1' style={{ color: 'white' }}>
+              로그인 유지
+            </label>
+          </div>
           <button type='submit'>LOG IN </button>
           <div>
             {' '}

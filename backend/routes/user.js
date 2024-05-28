@@ -9,14 +9,37 @@ const router = express.Router();
 router.post('/signup', async (req, res, next) => {
   const { id, password, nickname } = req.body;
   try {
+    const exId = await User.findOne({ id });
+    if (exId) {
+      return res.status(400).send('이미 존재하는 아이디입니다');
+    }
     const exUser = await User.findOne({ nickname });
     if (exUser) {
-      return res.status(400).send('이미 존재하는 아이디입니다.');
+      return res.status(400).send('이미 존재하는 닉네임입니다.');
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await new User({ id, nickname, password: hashedPassword });
     await user.save();
     return res.status(200).send('ok');
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.post('/autoLogin', async (req, res, next) => {
+  try {
+    const userId = req.session.passport?.user;
+    if (req.session.autoLogin) {
+      // 자동로그인 클릭 했을 때 로그인 바로 가능
+      const fullUserWithoutPassword = await User.findOne(
+        { _id: userId },
+        {
+          password: 0,
+        },
+      );
+      return res.status(200).json(fullUserWithoutPassword);
+    }
   } catch (error) {
     console.error(error);
     next(error);
@@ -47,8 +70,15 @@ router.post('/login', (req, res, next) => {
             password: 0,
           },
         );
-        // req.session.cookie.expires = new Date(Date.now() + 360000);
-        return res.status(200).json(fullUserWithoutPassword);
+        // autoLogin
+        if (req.body.autoLoginChecked) {
+          req.session.autoLogin = true;
+          req.session.cookie.maxAge = new Date(Date.now() + 24 * 60 * 60 * 60 * 60 * 60);
+        }
+
+        req.session.save(() => {
+          return res.status(200).json(fullUserWithoutPassword);
+        });
       });
     })(req, res, next);
   } catch (error) {
@@ -58,6 +88,9 @@ router.post('/login', (req, res, next) => {
 });
 
 router.post('/logout', (req, res, next) => {
+  if (req.cookies['keep-login']) {
+    res.clearCookie('keep-login');
+  }
   req.logout(function (err) {
     if (err) {
       return next(err);

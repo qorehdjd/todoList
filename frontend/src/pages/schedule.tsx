@@ -13,6 +13,7 @@ import { EventClickArg, EventContentArg } from '@fullcalendar/core/index.js';
 import { FaCheck } from 'react-icons/fa6';
 import { logout } from '../../reducers/user';
 import MonthLists from './Components/MonthLists';
+import axios from 'axios';
 
 const ScheduleLayout = styled.div`
   height: 100vh;
@@ -104,6 +105,7 @@ const Schedule = () => {
 
   const onClickDate = useCallback(
     async (e: DateClickArg) => {
+      console.log('eee', e);
       dispatch(postSlice.actions.reviseDate(e.dateStr));
       await dispatch(getDateList(e.dateStr));
       setIsOpenModal(true);

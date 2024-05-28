@@ -16,4 +16,7 @@ export interface InittialState {
   logoutloading: boolean;
   logoutDone: boolean;
   logoutError: boolean | any;
+  autoLoginLoading: boolean;
+  autoLoginDone: boolean;
+  autoLoginError: boolean | any;
 }

@@ -26,6 +26,9 @@ const TodoInputContainer = styled.form`
     font-size: 1.6rem;
   }
   button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: green;
     color: white;
     font-weight: 600;

@@ -106,9 +106,11 @@ const HomeLayout = styled.div`
 const SignUp = () => {
   const router = useRouter();
   const didMount = useRef(false);
+  const didMount2 = useRef(false);
   const dispatch = useDispatch<AppDispatch>();
 
   const signupDone = useSelector((state: RootState) => state.user.signupDone);
+  const signupError = useSelector((state: RootState) => state.user.signupError);
 
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
@@ -125,12 +127,26 @@ const SignUp = () => {
     }
   }, [signupDone, router]);
 
+  useEffect(() => {
+    if (didMount2.current) {
+      if (signupError) {
+        alert(signupError);
+      }
+    } else {
+      didMount2.current = true;
+    }
+  }, [signupError]);
+
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!id) return alert('아이디를 입력해주세요');
-      if (!password) return alert('비밀번호를 입력해주세요');
-      if (!nickname) return alert('닉네임을 입력해주세요');
+      const idRegExp = /^[a-zA-Z0-9]{4,10}$/;
+      const passRegExp = /^[a-zA-Z0-9]{4,12}$/;
+      const nicknameRegExp = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,8}$/;
+      if (!idRegExp.test(id)) return alert('아이디는 4~10자의 영문 대소문자와 숫자로만 입력해주세요');
+      if (!passRegExp.test(password)) return alert('비밀번호는 4~12자 영문 대소문자와 숫자로만 입력해주세요');
+      if (!nicknameRegExp.test(nickname))
+        return alert('닉네임은 2자 이상 8자 이하, 영어 또는 숫자 또는 한글로 구성해주세요');
       const data = {
         id,
         password,

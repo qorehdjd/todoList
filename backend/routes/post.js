@@ -33,6 +33,7 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   try {
+    console.log('reqreq', req.session);
     const post = await List.findOne({ userId: req.user._id, date: req.query.date });
     if (!post) {
       return res.status(200).json({ lists: [] });

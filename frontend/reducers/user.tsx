@@ -12,6 +12,9 @@ export const initialState: InittialState = {
   loginLoading: false,
   loginDone: false,
   loginError: false,
+  autoLoginLoading: false,
+  autoLoginDone: false,
+  autoLoginError: false,
   logoutloading: false,
   logoutDone: false,
   logoutError: false,
@@ -30,9 +33,22 @@ export const signup = createAsyncThunk(
   },
 );
 
-export const login = createAsyncThunk('user/login', async (data: { id: string; password: string }, thunkAPI) => {
+export const login = createAsyncThunk(
+  'user/login',
+  async (data: { id: string; password: string; autoLoginChecked: boolean | undefined }, thunkAPI) => {
+    try {
+      const response = await axios.post('/user/login', data);
+      return response.data;
+    } catch (err) {
+      const customErr = err as CustomError;
+      return thunkAPI.rejectWithValue(customErr.response?.data || customErr.message);
+    }
+  },
+);
+
+export const autoLogin = createAsyncThunk('user/autoLogin', async (_, thunkAPI) => {
   try {
-    const response = await axios.post('/user/login', data);
+    const response = await axios.post('/user/autoLogin');
     return response.data;
   } catch (err) {
     const customErr = err as CustomError;
@@ -77,6 +93,20 @@ const userSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loginLoading = false;
         state.loginError = action.payload;
+      })
+      .addCase(autoLogin.pending, (state) => {
+        state.autoLoginLoading = true;
+        state.autoLoginDone = false;
+        state.autoLoginError = false;
+      })
+      .addCase(autoLogin.fulfilled, (state, action) => {
+        state.autoLoginLoading = false;
+        state.autoLoginDone = true;
+        state.me = action.payload ? action.payload : null;
+      })
+      .addCase(autoLogin.rejected, (state, action) => {
+        state.autoLoginLoading = false;
+        state.autoLoginError = action.payload;
       })
       .addCase(logout.pending, (state) => {
         state.logoutloading = true;

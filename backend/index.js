@@ -5,6 +5,7 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
+const fileStore = require('session-file-store')(session);
 
 const userRouer = require('./routes/user');
 const postRouer = require('./routes/post');
@@ -42,6 +43,7 @@ app.use(
 );
 
 app.use(cookieParser(process.env.SECRET_KEY));
+
 app.use(
   session({
     secret: process.env.SECRET_KEY,
@@ -50,6 +52,7 @@ app.use(
     cookie: {
       httpOnly: true, // 스크립트 공격 방어 (XSS)
     },
+    store: new fileStore(),
   }),
 );
 
