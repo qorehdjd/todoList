@@ -21,7 +21,7 @@ const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
 // const setupStore = (context: any): EnhancedStore => store;

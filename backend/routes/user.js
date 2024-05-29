@@ -40,6 +40,7 @@ router.post('/autoLogin', async (req, res, next) => {
       );
       return res.status(200).json(fullUserWithoutPassword);
     }
+    return res.status(200).json(null);
   } catch (error) {
     console.error(error);
     next(error);
@@ -74,8 +75,8 @@ router.post('/login', (req, res, next) => {
         if (req.body.autoLoginChecked) {
           req.session.autoLogin = true;
           req.session.cookie.maxAge = new Date(Date.now() + 24 * 60 * 60 * 60 * 60 * 60);
+          res.setHeader('autoLogin', true); // 프론트 단에서 자동로그인 할 때 로그인페이지가 보였다가 달력 페이지로 가는 문제 해결 (ux경험 해결)
         }
-
         req.session.save(() => {
           return res.status(200).json(fullUserWithoutPassword);
         });

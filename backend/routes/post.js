@@ -17,7 +17,6 @@ router.post('/', async (req, res, next) => {
       existList.save();
       return res.status(200).json({ dateLists: existList, date });
     }
-
     const list = await new List({
       userId: req.user._id,
       date,
@@ -33,7 +32,6 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   try {
-    console.log('reqreq', req.session);
     const post = await List.findOne({ userId: req.user._id, date: req.query.date });
     if (!post) {
       return res.status(200).json({ lists: [] });

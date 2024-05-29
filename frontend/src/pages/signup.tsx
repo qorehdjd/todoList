@@ -111,10 +111,17 @@ const SignUp = () => {
 
   const signupDone = useSelector((state: RootState) => state.user.signupDone);
   const signupError = useSelector((state: RootState) => state.user.signupError);
+  const me = useSelector((state: RootState) => state.user.me);
 
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
+
+  useEffect(() => {
+    if (me) {
+      router.push('/');
+    }
+  }, [router, me]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -172,6 +179,10 @@ const SignUp = () => {
   const onClickLogin = useCallback(() => {
     router.push('/login');
   }, []);
+
+  if (me) {
+    return null;
+  }
 
   return (
     <HomeLayout>

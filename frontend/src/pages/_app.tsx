@@ -48,6 +48,13 @@ const App = ({ Component, pageProps }: AppProps) => {
           <GlobalStyle />
           <Head>
             <meta charSet='utf-8' />
+            <meta name='viewport' content='width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1' />
+            <meta
+              name='description'
+              content='사용자가 원하는 날짜를 클릭하여 일정들을 추가할 수 있는 날짜 어플리케이션입니다.'
+            />
+            <meta name='keywords' content='일정, 달력, 날짜' />
+            <meta name='author' content='james' />
             <title>todoList</title>
           </Head>
           <Component {...pageProps.pageProps} />

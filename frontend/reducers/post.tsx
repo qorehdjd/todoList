@@ -126,6 +126,10 @@ const postSlice = createSlice({
     reviseDate(state, action) {
       state.date = action.payload;
     },
+    getLatelyLists(state, action) {
+      const lists = action.payload.map((list: { title: string; count: number }) => ({ title: list.title, count: 1 }));
+      state.posts.dateLists = lists;
+    },
   },
   extraReducers: (builder) =>
     builder

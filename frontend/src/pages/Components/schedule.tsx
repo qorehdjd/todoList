@@ -2,18 +2,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
-import Todo from './todo';
+import Todo from '../todo';
 import styled from 'styled-components';
 import moment from 'moment';
-import postSlice, { getDateList, getLists, getMonthLists } from '../../reducers/post';
+import postSlice, { getDateList, getLists, getMonthLists } from '../../../reducers/post';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
-import Login from './login';
+import { AppDispatch, RootState } from '../../../store';
+import Login from '../login';
 import { EventClickArg, EventContentArg } from '@fullcalendar/core/index.js';
 import { FaCheck } from 'react-icons/fa6';
-import { logout } from '../../reducers/user';
-import MonthLists from './Components/MonthLists';
-import axios from 'axios';
+import { logout } from '../../../reducers/user';
+import MonthLists from './MonthLists';
 
 const ScheduleLayout = styled.div`
   height: 100vh;
@@ -23,7 +22,6 @@ const ScheduleLayout = styled.div`
   .logout_wrapper {
     margin: 5px 0 15px 0;
     text-align: right;
-    margin-right: 20px;
     button {
       background-color: green;
       color: white;
@@ -46,6 +44,10 @@ const ScheduleLayout = styled.div`
     flex: 1;
     font-size: 2rem;
     overflow: scroll;
+  }
+
+  .fc-day {
+    cursor: pointer;
   }
 
   .fc-day-today {
@@ -84,7 +86,11 @@ const Schedule = () => {
       (async () => {
         await dispatch(getLists());
         dispatch(postSlice.actions.reviseDate(moment().format('YYYY-MM-DD')));
-        await dispatch(getDateList(moment().format('YYYY-MM-DD')));
+        const response = await dispatch(getDateList(moment().format('YYYY-MM-DD')));
+        if (response.payload.lists.length === 0 && localStorage.getItem('latelyLists')) {
+          // 첫 렌더링에 오늘 날짜 리스트들을 보여주는데 오늘 날짜에 아무것도 없을 때 가장 마지막에 저장한 리스트들 렌더링
+          dispatch(postSlice.actions.getLatelyLists(JSON.parse(localStorage.getItem('latelyLists') || '{}')));
+        }
         setIsOpenModal(true);
       })();
     }
@@ -105,7 +111,13 @@ const Schedule = () => {
 
   const onClickDate = useCallback(
     async (e: DateClickArg) => {
-      console.log('eee', e);
+      if (e.dayEl.outerText.split('\n').length === 1 && localStorage.getItem('latelyLists')) {
+        // date에 아무것도 없는 빈공간 일때 로컬스토리지에 저장된 가장 마지막에 저장한 데이터들이 들어감
+        dispatch(postSlice.actions.reviseDate(e.dateStr));
+        dispatch(postSlice.actions.getLatelyLists(JSON.parse(localStorage.getItem('latelyLists') || '{}')));
+        setIsOpenModal(true);
+        return;
+      }
       dispatch(postSlice.actions.reviseDate(e.dateStr));
       await dispatch(getDateList(e.dateStr));
       setIsOpenModal(true);

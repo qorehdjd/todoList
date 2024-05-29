@@ -38,6 +38,9 @@ export const login = createAsyncThunk(
   async (data: { id: string; password: string; autoLoginChecked: boolean | undefined }, thunkAPI) => {
     try {
       const response = await axios.post('/user/login', data);
+      if (response.headers.autologin) {
+        localStorage.setItem('autoLogin', 'true');
+      }
       return response.data;
     } catch (err) {
       const customErr = err as CustomError;
@@ -112,6 +115,7 @@ const userSlice = createSlice({
         state.logoutloading = true;
         state.logoutDone = false;
         state.logoutError = false;
+        localStorage.removeItem('autoLogin');
       })
       .addCase(logout.fulfilled, (state, action) => {
         state.logoutloading = false;

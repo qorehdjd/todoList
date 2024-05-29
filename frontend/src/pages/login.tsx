@@ -176,7 +176,6 @@ const Login = () => {
   if (me) {
     return null;
   }
-  console.log('checkboxRef', checkboxRef.current?.checked);
   return (
     <HomeLayout>
       <div className='myform'>

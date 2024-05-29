@@ -5,7 +5,7 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
-const fileStore = require('session-file-store')(session);
+const MongoStore = require('connect-mongo');
 
 const userRouer = require('./routes/user');
 const postRouer = require('./routes/post');
@@ -39,6 +39,7 @@ app.use(
   cors({
     origin: ['http://localhost:3000'],
     credentials: true,
+    exposedHeaders: ['Autologin'],
   }),
 );
 
@@ -52,7 +53,7 @@ app.use(
     cookie: {
       httpOnly: true, // 스크립트 공격 방어 (XSS)
     },
-    store: new fileStore(),
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
   }),
 );
 
