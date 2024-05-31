@@ -105,9 +105,7 @@ const userSlice = createSlice({
       .addCase(autoLogin.fulfilled, (state, action) => {
         state.autoLoginLoading = false;
         state.autoLoginDone = true;
-        if (action.payload) {
-          state.me = action.payload ? action.payload : null;
-        }
+        state.me = action.payload ? action.payload : null;
       })
       .addCase(autoLogin.rejected, (state, action) => {
         state.autoLoginLoading = false;
