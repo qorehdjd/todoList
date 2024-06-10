@@ -5,6 +5,7 @@ import Login from './login';
 import Schedule from './Components/schedule';
 import { AppDispatch, RootState } from '../../store';
 import { autoLogin } from '../../reducers/user';
+import ProductPayment from './productPayment';
 
 const Home = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +22,19 @@ const Home = () => {
     return null;
   }
 
-  return <>{me ? <Schedule /> : <Login />}</>;
+  if (me) {
+    if (new Date(me.subscriptionPeriod) > new Date()) {
+      return <Schedule />;
+    }
+  }
+  if (me && !me.subscriptionPeriod) {
+    return <ProductPayment />;
+  }
+  if (me && me.subscriptionPeriod < new Date()) {
+    return <ProductPayment />;
+  }
+
+  return <>{!me && <Login />}</>;
 };
 
 export default Home;

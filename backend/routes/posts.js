@@ -19,7 +19,6 @@ router.get('/monthLists', async (req, res, next) => {
     const lists = await List.find({ userId: req.user._id })
       .where('date')
       .regex(new RegExp(`${yearAndMonth}`));
-    console.log('listsss', lists);
     const data = lists
       .map((list) => {
         const data = list.items.map((item) => {

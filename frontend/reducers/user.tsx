@@ -6,6 +6,7 @@ import { CustomError } from '../types/error';
 
 export const initialState: InittialState = {
   me: null,
+  certificatedUser: false,
   signupLoading: false,
   signupDone: false,
   signupError: false,
@@ -67,7 +68,13 @@ export const logout = createAsyncThunk('user/logout', async () => {
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    subscribedUser(state, action) {
+      if (state.me) {
+        state.me.subscriptionPeriod = action.payload;
+      }
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(signup.pending, (state) => {

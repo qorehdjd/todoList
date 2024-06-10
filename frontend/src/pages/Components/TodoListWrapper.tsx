@@ -105,7 +105,7 @@ const TodoListWrapper = ({ onCloseModal }: { onCloseModal: () => void }) => {
       return;
     }
     const ModifiedDateLists = dateLists.filter((dateList) => dateList.count !== 0); // count가 0인것은 제외하고 보내기
-    localStorage.setItem('latelyLists', JSON.stringify(ModifiedDateLists));
+    localStorage.setItem('latelyLists', JSON.stringify(dateLists)); //count 0인것도 포함
     const data = {
       dateLists: ModifiedDateLists,
       date,

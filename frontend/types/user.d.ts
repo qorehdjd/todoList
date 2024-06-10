@@ -3,10 +3,12 @@ export interface userData {
   nickname: string;
   likePosts: { nickname: string }[];
   dislikePosts: { nickname: string }[];
+  subscriptionPeriod: Date;
 }
 
 export interface InittialState {
   me: userData | null;
+  certificatedUser: boolean;
   signupLoading: boolean;
   signupDone: boolean;
   signupError: boolean | any;

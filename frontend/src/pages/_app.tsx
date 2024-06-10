@@ -1,12 +1,13 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import React from 'react';
+import React, { useState } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { Provider } from 'react-redux';
 import store, { persistor } from '../../store';
 import { PersistGate } from 'redux-persist/integration/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 config.autoAddCss = false;
 
 const GlobalStyle = createGlobalStyle`
@@ -41,6 +42,8 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const App = ({ Component, pageProps }: AppProps) => {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <>
       <Provider store={store}>
@@ -57,7 +60,9 @@ const App = ({ Component, pageProps }: AppProps) => {
             <meta name='author' content='james' />
             <title>todoList</title>
           </Head>
-          <Component {...pageProps.pageProps} />
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps.pageProps} />
+          </QueryClientProvider>
         </PersistGate>
       </Provider>
     </>

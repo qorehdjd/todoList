@@ -4,12 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { login } from '../../reducers/user';
 import { AppDispatch, RootState } from '../../store';
+import Footer from '@/Layout/Footer';
+import Header from '@/Layout/Header';
 
 const HomeLayout = styled.div`
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   .id_input,
   .password_input {
     height: 40px;
@@ -76,6 +79,7 @@ const HomeLayout = styled.div`
   .myform {
     background: #0b2144;
     width: 40%;
+    margin: auto 0;
     height: fit-content;
     -webkit-box-shadow: 0px 0px 3px 1px rgba(38, 35, 128, 1);
     -moz-box-shadow: 0px 0px 3px 1px rgba(38, 35, 128, 1);
@@ -104,9 +108,9 @@ const HomeLayout = styled.div`
     /* Firefox 18- */
     color: #cccccc;
   }
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 1000px) {
     .myform {
-      width: 60%;
+      width: 80%;
     }
   }
   @media screen and (max-width: 500px) {
@@ -178,6 +182,7 @@ const Login = () => {
   }
   return (
     <HomeLayout>
+      <Header />
       <div className='myform'>
         <div className='logo'>PLEASE LOG IN!</div>
         <form onSubmit={onSubmit}>
@@ -204,6 +209,7 @@ const Login = () => {
           </div>
         </form>
       </div>
+      <Footer />
     </HomeLayout>
   );
 };

@@ -16,6 +16,7 @@ const UserSchema = mongoose.Schema({
     required: true,
     maxLength: 10,
   },
+  subscriptionPeriod: Date,
 });
 
 const User = mongoose.model('User', UserSchema);

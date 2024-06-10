@@ -87,7 +87,7 @@ const Schedule = () => {
         await dispatch(getLists());
         dispatch(postSlice.actions.reviseDate(moment().format('YYYY-MM-DD')));
         const response = await dispatch(getDateList(moment().format('YYYY-MM-DD')));
-        if (response.payload.lists.length === 0 && localStorage.getItem('latelyLists')) {
+        if (response.payload.lists?.length === 0 && localStorage.getItem('latelyLists')) {
           // 첫 렌더링에 오늘 날짜 리스트들을 보여주는데 오늘 날짜에 아무것도 없을 때 가장 마지막에 저장한 리스트들 렌더링
           dispatch(postSlice.actions.getLatelyLists(JSON.parse(localStorage.getItem('latelyLists') || '{}')));
         }
