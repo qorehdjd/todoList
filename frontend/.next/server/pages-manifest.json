@@ -1,1 +1,7 @@
-{"/_app":"pages/_app.js","/_error":"pages/_error.js","/_document":"pages/_document.js","/Components/MonthLists":"pages/Components/MonthLists.html","/Components/TodoInput":"pages/Components/TodoInput.html","/Components/TodoListWrapper":"pages/Components/TodoListWrapper.html","/Components/TodoList":"pages/Components/TodoList.html","/Components/checkout":"pages/Components/checkout.html","/fail":"pages/fail.html","/Components/schedule":"pages/Components/schedule.html","/":"pages/index.html","/login":"pages/login.html","/signup":"pages/signup.html","/productPayment":"pages/productPayment.html","/success":"pages/success.html","/todo":"pages/todo.html","/404":"pages/404.html"}
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/": "pages/index.js",
+  "/productPayment": "pages/productPayment.js"
+}
