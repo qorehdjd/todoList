@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const PaymentSchema = mongoose.Schema({
+const PaymentSchema = new mongoose.Schema({
   paymentKey: String,
   orderId: String,
   userId: String,

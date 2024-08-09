@@ -139,7 +139,7 @@ const Schedule = () => {
       <>
         {eventInfo.event.title
           .split(',')
-          .slice(0, 3) // 달력에 list 3개까지만 표시
+          .slice(0, 200) // 달력에 list 3개까지만 표시
           .map((tit) => {
             if (!tit) return null;
             return (

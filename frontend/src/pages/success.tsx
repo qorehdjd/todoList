@@ -25,11 +25,11 @@ const SuccessPage = () => {
     // https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8
     try {
       const response = await axios.post(
-        'http://localhost:3085/sandbox-dev/api/v1/payments/confirm',
+        'https://api.count101.shop/sandbox-dev/api/v1/payments/confirm',
         JSON.stringify({
           paymentKey,
           orderId,
-          amount,
+          amount: Number(amount),
         }),
         {
           headers: {

@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const ProductPaymentLayout = styled.div`
   height: 100vh;
@@ -64,13 +65,10 @@ const ProductPayment = () => {
   const router = useRouter();
   const me = useSelector((state: RootState) => state.user.me);
 
-  // const [showCheckoutPage, setShowCheckoutPage] = useState(false);
-
-  useEffect(() => {
-    if (!me) {
-      router.push('/');
-    }
-  }, [router, me]);
+  const createOrder = async (amount: number) => {
+    const response = await axios.post('https://api.count101.shop/order', { amount });
+    return response.data.orderId;
+  };
 
   const onclickPaymentItem = useCallback(
     (price: number) => async () => {
@@ -79,25 +77,19 @@ const ProductPayment = () => {
       }
       const clientkey = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_SECRET_KEY;
       if (clientkey) {
+        const orderId = await createOrder(price);
+
         await loadTossPayments(clientkey).then((tossPayments) => {
           // ------ 결제창 띄우기 ------
           tossPayments
             .requestPayment('카드', {
-              // 결제수단 파라미터
-              // 결제 정보 파라미터
-              // 더 많은 결제 정보 파라미터는 결제창 Javascript SDK에서 확인하세요.
-              // https://docs.tosspayments.com/reference/js-sdk
               amount: price, // 결제 금액
-              orderId: new Date().getTime() + '_' + nanoid(), // 주문번호
+              orderId, // 주문번호
               orderName: '정기 구독결제', // 구매상품
               customerName: '김토스', // 구매자 이름
               successUrl: `${window.location.origin}/success`,
               failUrl: `${window.location.origin}/fail`,
             })
-            // ------ 결제창을 띄울 수 없는 에러 처리 ------
-            // 메서드 실행에 실패해서 reject 된 에러를 처리하는 블록입니다.
-            // 결제창에서 발생할 수 있는 에러를 확인하세요.
-            // https://docs.tosspayments.com/reference/error-codes#결제창공통-sdk-에러
             .catch(function (error) {
               console.log('errror', error);
               if (error.code === 'USER_CANCEL') {
@@ -108,7 +100,6 @@ const ProductPayment = () => {
             });
         });
       }
-      // setShowCheckoutPage(true);
     },
     [me],
   );
@@ -122,6 +113,7 @@ const ProductPayment = () => {
           width: '100%',
           backgroundColor: 'rgba(0, 0, 0, .25)',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           position: 'relative',
@@ -170,6 +162,21 @@ const ProductPayment = () => {
               </li>
             </ul>
           </div>
+        </div>
+        <div style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: '600', marginTop: '1.5rem' }}>
+          월간/연간 결제시 이용기간이 지나면
+          <br />
+          서비스를 이용하실 수 없습니다.
+        </div>
+        <div style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: '600', marginTop: '1.5rem' }}>
+          월간/연간 결제시 홈페이지 내에서 일정표(기록표)
+          <br />
+          서비스를 이용하실 수 있습니다.
+        </div>
+        <div style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: '600', marginTop: '1.5rem' }}>
+          월간/연간 결제를 한 후, 다시 로그인 하거나 왼쪽 상단에 로고를 누르면
+          <br />
+          서비스를 이용하실 수 있습니다.
         </div>
         {/* {showCheckoutPage ? <Checkout setShowCheckoutPage={setShowCheckoutPage} /> : null} */}
       </div>
